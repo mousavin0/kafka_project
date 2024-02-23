@@ -1,11 +1,11 @@
 from kafka import KafkaProducer
-from db_setup import make_inventory_if_not_exists,add_to_inventory
+from db_setup import make_inventory_if_not_exists,inventory_replenishment
 from sqlite3 import Cursor
 import random
 import json
 import datetime
 import time
-from constants import MU,SIGMA
+from constants import MU,SIGMA, MIN_STOCK_LEVEL
 # from add_to_price import reset_products_list
 
 
@@ -28,8 +28,8 @@ def random_products(
         quantity = random.randint(1,10)
 
         # Change here if you need to control if the inventory runs out
-        if prod[5] == 0:
-            #update the whole inventory
+        if prod[5] == MIN_STOCK_LEVEL:
+            #will update the whole inventory
             inventory_runs_out = True
 
 
@@ -88,7 +88,7 @@ if __name__ == "__main__":
                 if inventory_runs_out:
                     cursor.close()
                     db.close()
-                    cursor, db = add_to_inventory()
+                    cursor, db = inventory_replenishment()
                     # cursor.close()
                     inventory_runs_out = False
             producer.flush()

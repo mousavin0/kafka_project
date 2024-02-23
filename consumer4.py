@@ -1,6 +1,6 @@
 from kafka import KafkaConsumer
 import json
-from constants import PRODUCTS_DB_PATH
+from constants import PRODUCTS_DB_PATH, MIN_STOCK_LEVEL
 from db_setup import make_inventory_if_not_exists
 
 
@@ -14,16 +14,22 @@ def update_product_balance(productid,quantity,cursor,db):
     values = (productid, )
     quantity_old = cursor.execute(sql_query,values).fetchone()[0]
     print(f'Quantity for product {productid} before the order : {quantity_old}')
-    sql_query = "UPDATE products SET saldo = ? WHERE productid = ?"
-    values = (quantity_old - quantity , productid)
-    cursor.execute(sql_query,values)
-    
-    
-    sql_query = "SELECT saldo FROM products WHERE productid = ?"
-    values = (productid, )
-    quantity_new = cursor.execute(sql_query,values).fetchone()[0]
-    print(f'Quantity for product {productid} after the order : {quantity_new}')
-    db.commit()
+
+    if quantity_old - quantity < MIN_STOCK_LEVEL:
+        print("Something went wrong! HANDLE CUNCURRENT ORDERS!")
+
+    else:
+        sql_query = "UPDATE products SET saldo = ? WHERE productid = ?"
+        values = (quantity_old - quantity , productid)
+        cursor.execute(sql_query,values)
+        
+        #remove this
+        sql_query = "SELECT saldo FROM products WHERE productid = ?"
+        values = (productid, )
+        quantity_new = cursor.execute(sql_query,values).fetchone()[0]
+        print(f'Quantity for product {productid} after the order : {quantity_new}')
+
+        db.commit()
     
 
 if __name__ == "__main__":

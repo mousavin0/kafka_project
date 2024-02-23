@@ -69,7 +69,7 @@ def make_inventory_if_not_exists():
 
 
 
-def add_to_inventory():
+def inventory_replenishment():
     db = sqlite3.connect(PRODUCTS_DB_PATH)
     cursor = db.cursor()
 
