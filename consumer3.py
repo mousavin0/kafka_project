@@ -18,9 +18,9 @@ def report_consumer():
         'Orders',
         bootstrap_servers='localhost:9092',  # Update with your Kafka bootstrap server address
         auto_offset_reset='earliest',
-        enable_auto_commit=True,
-        value_deserializer=lambda x: json.loads(x.decode('utf-8')),
-        auto_commit_interval_ms=3000
+        # enable_auto_commit=True,
+        value_deserializer=lambda x: json.loads(x.decode('utf-8'))
+        # auto_commit_interval_ms=3000
     )
     try:
         for message in consumer:

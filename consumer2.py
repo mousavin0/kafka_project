@@ -8,9 +8,9 @@ consumer = KafkaConsumer(
     'Orders',
     bootstrap_servers='localhost:9092',
     auto_offset_reset='earliest',
-    enable_auto_commit=True,
-    value_deserializer=lambda x: json.loads(x.decode('utf-8')),
-    auto_commit_interval_ms=3000
+    # enable_auto_commit=True,
+    value_deserializer=lambda x: json.loads(x.decode('utf-8'))
+    # auto_commit_interval_ms=3000
 )
 total_sales_count = 0
 last_hour_sales_count = 0
