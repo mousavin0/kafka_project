@@ -9,7 +9,7 @@ from constants import MU,SIGMA, MIN_STOCK_LEVEL
 # from add_to_price import reset_products_list
 
 
-inventory_runs_out = False
+stock_level_will_become_low = False
 CUSTOMER_ID = [id for id in range(10000,13000)]
 
 def random_products(
@@ -19,7 +19,7 @@ def random_products(
         ) -> list[dict]:
     
     list_of_random_products = []
-    global inventory_runs_out
+    global stock_level_will_become_low
 
     for _ in range(nr_of_prod_to_random):
         rand_prod_id = random.randint(1,nr_of_prod_in_db)
@@ -27,16 +27,13 @@ def random_products(
 
         quantity = random.randint(1,10)
 
-        # Change here if you need to control if the inventory runs out
-        if prod[5] == MIN_STOCK_LEVEL:
-            #will update the whole inventory
-            inventory_runs_out = True
-
-
-
-
-
         if quantity > prod[5]: quantity = 0
+
+
+                # Change here if you need to control if the inventory runs out
+        if prod[5] - quantity < MIN_STOCK_LEVEL:
+            #will update the whole inventory
+            stock_level_will_become_low = True
 
         random_product = {"product_id": prod[0],
                           "product_name": prod[1],
@@ -77,20 +74,26 @@ if __name__ == "__main__":
     value_serializer=lambda v: json.dumps(v).encode(encoding='utf-8')
     )
     try:
+        counter=0
         while True:
             time.sleep(1)
             random_whole_numb_gaussian = int(random.gauss(mu=MU, sigma=SIGMA))
             for _ in range(random_whole_numb_gaussian):
-                order_id += 1
+                order_id += 0
                 new_order = random_order(order_id, number_of_products_in_database, cursor)
-                producer.send("Orders", new_order)  
-                print(new_order)
-                if inventory_runs_out:
+
+                if stock_level_will_become_low:
                     cursor.close()
                     db.close()
                     cursor, db = inventory_replenishment()
                     # cursor.close()
-                    inventory_runs_out = False
+                    stock_level_will_become_low = False
+
+                producer.send("Orders", new_order)  
+                # print(new_order)
+                counter +=1
+                print(counter)
+
             producer.flush()
 
     except KeyboardInterrupt:

@@ -92,13 +92,14 @@ def inventory_replenishment():
         prod = str(value)
         p = prod.strip().strip("(").strip(")").strip("\n").replace(" ","").split(',')
         # cursor.execute(f"INSERT INTO products (productname, type, pricetype, price, saldo) VALUES({p[0]},{p[1]},{p[2]},{p[3]},{p[4]})")
-        sql_query = f"SELECT saldo FROM products WHERE productname = ?"
-        values = (p[0].strip('\''),)
-        old_quantity = cursor.execute(sql_query,values).fetchone()[0]
-        print(old_quantity)
+        # sql_query = f"SELECT saldo FROM products WHERE productname = ?"
+        # values = (p[0].strip('\''),)
+        # old_quantity = cursor.execute(sql_query,values).fetchone()[0]
+        # print(old_quantity)
         # print(int(p[4].strip('\'')))
         sql_query = f"UPDATE products SET saldo = ? WHERE productname = ?"
-        values = (old_quantity + int(p[4].strip('\'')), p[0].strip('\''))
+        # values = (old_quantity + int(p[4].strip('\'')), p[0].strip('\''))
+        values = (int(p[4].strip('\'')), p[0].strip('\''))
         cursor.execute(sql_query,values)
         db.commit()
     print("INVENTORY UPDATED!")

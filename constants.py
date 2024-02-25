@@ -14,12 +14,12 @@ FILE_NAME = "produkter.txt"
 
 
 # Parameters for a normal distribution
-MU = 0.1 # dictates the avrage amount of orders sent for each second
+MU = 10 # dictates the avrage amount of orders sent for each second
 SIGMA = 1 # dictates the variaton around MU, small number implies more likely MU orders, bigger number the oposit
 
 
 
-MIN_STOCK_LEVEL = 30
+MIN_STOCK_LEVEL = 20
 
 
 AUTO_COMMIT_OFFSET_MS = 3000
