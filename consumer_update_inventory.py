@@ -15,7 +15,7 @@ def update_product_balance(productid,quantity,cursor,db):
     quantity_old = cursor.execute(sql_query,values).fetchone()[0]
     print(f'Quantity for product {productid} before the order : {quantity_old}')
 
-    if quantity_old - quantity < MIN_STOCK_LEVEL:
+    if quantity_old - quantity < 0:
         print("Something went wrong! HANDLE CUNCURRENT ORDERS!")
 
     else:
