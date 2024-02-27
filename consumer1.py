@@ -1,13 +1,14 @@
 from kafka import KafkaConsumer
 import json
 from datetime import datetime
+from constants import KAFKA_BOOTSTRAP_SERVERS
 
 total_orders_count = 0
 now_datetime = datetime.now()
 
 consumer = KafkaConsumer(
     'Orders',
-    bootstrap_servers='localhost:9092',
+    bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
     auto_offset_reset='earliest', # read from older times too, not just from now on
     # group_id= 'analytics3', # default is None which means do not commit offset, everytime count from earliest that exists, regardless of previous runs
     # enable_auto_commit=False, #everytime count from earliest that exists, regardless of previous runs, ALTERNATIVELY set group_id equal to None

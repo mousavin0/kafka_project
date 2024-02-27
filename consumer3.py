@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import schedule
 import time
 from threading import Thread
+from constants import REPORT_FILES_CREATIMG_TIME,REPORT_FILES_TIME_CHECKING_INTERVAL_SECONDS,REPORT_FILES_WAIT_TIME_BEFORE_RESETTING_COUNTERS_SECONDS,KAFKA_BOOTSTRAP_SERVERS
 
 total_orders_count = 0
 total_sales_amount = 0
@@ -16,7 +17,7 @@ today = datetime.now()
 def report_consumer():
     consumer = KafkaConsumer(
         'Orders',
-        bootstrap_servers='localhost:9092',  # Update with your Kafka bootstrap server address
+        bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,  # Update with your Kafka bootstrap server address
         auto_offset_reset='earliest',
         # enable_auto_commit=True,
         value_deserializer=lambda x: json.loads(x.decode('utf-8'))
@@ -34,7 +35,7 @@ def report_consumer():
 
             if end_time.day != today.day:
                 #wait to make sure the correct count is not lost before written in the report
-                time.sleep(20)
+                time.sleep(REPORT_FILES_WAIT_TIME_BEFORE_RESETTING_COUNTERS_SECONDS)
 
                 today = datetime.now()
                 total_orders_count = 0
@@ -63,11 +64,11 @@ def report_consumer():
         consumer.close()
 
 def create_report():
-    schedule.every().day.at("17:37").do(generate_daily_report)
+    schedule.every().day.at(REPORT_FILES_CREATIMG_TIME).do(generate_daily_report)
     # schedule.every(1).minutes.do(generate_daily_report)
     while True:
         schedule.run_pending()
-        time.sleep(10)  # Sleep for 60 seconds between checks
+        time.sleep(REPORT_FILES_TIME_CHECKING_INTERVAL_SECONDS)  # Sleep for 60 seconds between checks
 
 def generate_daily_report():
     global total_orders_count

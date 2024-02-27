@@ -1,12 +1,12 @@
 from kafka import KafkaConsumer
 import json
 from datetime import datetime
-
+from constants import KAFKA_BOOTSTRAP_SERVERS
 
 
 consumer = KafkaConsumer(
     'Orders',
-    bootstrap_servers='localhost:9092',
+    bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
     auto_offset_reset='earliest',
     # enable_auto_commit=True,
     value_deserializer=lambda x: json.loads(x.decode('utf-8'))

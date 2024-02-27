@@ -1,6 +1,6 @@
 from kafka import KafkaConsumer
 import json
-from constants import  MIN_STOCK_LEVEL,AUTO_COMMIT_OFFSET_MS
+from constants import  MIN_STOCK_LEVEL,AUTO_COMMIT_OFFSET_MS,KAFKA_BOOTSTRAP_SERVERS
 from db_setup import make_inventory_if_not_exists
 
 import time
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     cursor,db = make_inventory_if_not_exists()
     consumer = KafkaConsumer(
         'Orders',
-        bootstrap_servers='localhost:9092',
+        bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
         auto_offset_reset='earliest', 
         group_id= 'inventory_update', #if groupid is none, offset will not get updated. meaning we go through same orders again for a second run of the code
         enable_auto_commit=True,

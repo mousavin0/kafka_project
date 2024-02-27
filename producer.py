@@ -5,9 +5,7 @@ import random
 import json
 import datetime
 import time
-from constants import MU,SIGMA, MIN_STOCK_LEVEL
-# from add_to_price import reset_products_list
-
+from constants import MU,SIGMA, MIN_STOCK_LEVEL,KAFKA_BOOTSTRAP_SERVERS, SLEEP_TIME_BEFORE_SIMULATING_NEW_ORDERS, MIN_NUM_OF_PRODUCTS_IN_EACH_ORDER, MAX_NUM_OF_PRODUCTS_IN_EACH_ORDER,MIN_QUANTITY_OF_PRODUCTS_IN_EACH_ORDER,MAX_QUANTITY_OF_PRODUCTS_IN_EACH_ORDER
 
 stock_level_will_become_low = False
 CUSTOMER_ID = [id for id in range(10000,13000)]
@@ -25,7 +23,7 @@ def random_products(
         rand_prod_id = random.randint(1,nr_of_prod_in_db)
         prod = cursor.execute(f"SELECT * FROM products WHERE productid={rand_prod_id}").fetchone()
 
-        quantity = random.randint(1,10)
+        quantity = random.randint(MIN_NUM_OF_PRODUCTS_IN_EACH_ORDER,MAX_NUM_OF_PRODUCTS_IN_EACH_ORDER)
 
         if quantity > prod[5]: quantity = 0
 
@@ -46,9 +44,13 @@ def random_products(
 
     return list_of_random_products
 
+
+
+
+
 def random_order(order_id:int, num_of_prod:int, cursor:Cursor) -> dict:
     customer_id = random.choice(CUSTOMER_ID)
-    products = random_products(random.randint(1,5), num_of_prod, cursor)
+    products = random_products(random.randint(MIN_NUM_OF_PRODUCTS_IN_EACH_ORDER,MAX_NUM_OF_PRODUCTS_IN_EACH_ORDER), num_of_prod, cursor)
     order_time = datetime.datetime.now().strftime("%m/%d/%Y-%H:%M:%S")
 
     new_order = dict(order_id=order_id,
@@ -56,6 +58,11 @@ def random_order(order_id:int, num_of_prod:int, cursor:Cursor) -> dict:
                      order_details=products,
                      order_time=order_time) 
     return new_order
+
+
+
+
+
 
 
 if __name__ == "__main__":
@@ -70,13 +77,13 @@ if __name__ == "__main__":
     number_of_products_in_database = len(products)
 
     producer = KafkaProducer(
-    bootstrap_servers='localhost:9092',
+    bootstrap_servers = KAFKA_BOOTSTRAP_SERVERS,
     value_serializer=lambda v: json.dumps(v).encode(encoding='utf-8')
     )
     try:
         counter=0
         while True:
-            time.sleep(1)
+            time.sleep(SLEEP_TIME_BEFORE_SIMULATING_NEW_ORDERS)
             random_whole_numb_gaussian = int(random.gauss(mu=MU, sigma=SIGMA))
             for _ in range(random_whole_numb_gaussian):
                 order_id += 0
