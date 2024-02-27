@@ -24,7 +24,7 @@ try:
         # print(json.dumps(message.value, indent=4))
         end_time = datetime.now()
 
-        if end_time.hour != today.hour:
+        if end_time.hour != today.hour or end_time.day != today.day or end_time.month != today.month or end_time.year != today.year:
             today = datetime.now()
             last_hour_sales_count = 0
             print('starting to count last hour sales from zero')
